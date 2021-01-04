@@ -1,3 +1,9 @@
+const user = {
+    username: 'null',
+    age: -1,
+    hashtags: []
+};
+
 const alertDatas = {
     exitDuringMatch: {
         title: "Matching Cancel",
@@ -58,6 +64,112 @@ function setContentsSize() {
 }
 
 
+function hanldeUserProfile() {
+    const infoInputs = document.querySelectorAll('.info-form .textbox input');
+    const tagInput = document.querySelector('.new-tag .tagbox input');
+    function compareUsername(username) {
+        if (username.length > 16) {
+            return false;
+        }
+        return true;
+    }
+    function compareAge(age) {
+        if (!(/^\d\d$/.test(age))) {
+            return false;
+        }
+        if (age[0] === '0' && age[1] === '0') {
+            return false;
+        }
+        return true;
+    }
+
+
+    function drawHashTag() {
+        const tagList = document.querySelector('.tag-list');
+        let query = ``;
+        user.hashtags.forEach((hashtag, i) => {
+            query += `<li id = "tag-${i + 1}" class = "tag-items">
+                        <span class = "text">${hashtag}</span>
+                        <i class = "fas fa-times x-btn"></i>               
+                        </li>`
+        });
+
+        tagList.innerHTML = query;
+    }
+
+    function setHashtag(e) {
+        e.stopPropagation();
+        const len = user.hashtags.length;
+        const hashtag = e.target.value;
+        if (hashtag !== '' && len < 5) {
+            user.hashtags.push(hashtag);
+
+            drawHashTag();
+        }
+        e.target.value = '';
+    }
+    function removeTagEvent(e) {
+        const target = e.target;
+        let flag = false;
+        target.classList.forEach(e => {
+            if (e === 'x-btn') flag = true;
+        });
+
+        if (flag) {
+            const tag = target.parentNode;
+
+            const tagId = tag.getAttribute('id');
+            const index = parseInt(tagId.slice(tagId.length - 1), 10) - 1;
+
+            user.hashtags.splice(index, 1);
+
+            drawHashTag()
+        }
+    }
+
+    infoInputs.forEach(input => {
+        console.log(input);
+        input.addEventListener('focus', (e) => {
+            const textbox = e.target.parentNode;
+            textbox.classList.add('visible');
+        });
+
+        input.addEventListener('blur', (e) => {
+            const textbox = e.target.parentNode;
+            const value = e.target.value;
+
+            // value is empty 
+            if (value === '') {
+                textbox.classList.remove('visible');
+            } else {
+                const type = e.target.name;
+                if (type === 'username') {
+                    if (compareUsername(value)) {
+                        user.username = value;
+                    }
+                } else if (type === 'age') {
+                    if (compareAge(value)) {
+                        user.age = parseInt(value, 10);
+                    }
+                }
+                console.log(user.username, user.age);
+            }
+        });
+    });
+    const tagList = document.querySelector('.tag-list');
+    tagInput.addEventListener('keydown', (e) => {
+        if (e.keyCode == 13) {
+            setHashtag(e);
+            tagList.addEventListener('click', removeTagEvent);
+        }
+    });
+    tagInput.addEventListener('blur', (e) => {
+        setHashtag(e);
+        tagList.addEventListener('click', removeTagEvent);
+    });
+
+}
+
 (function () {
     "use strict";
     const alert = document.querySelector('.modal.alert');
@@ -86,9 +198,10 @@ function setContentsSize() {
 
 
     setContentsSize();
-
-    document.querySelector('.start-btn').addEventListener('click', () => {
+    hanldeUserProfile();
+    document.querySelector('.chat-start-btn').addEventListener('click', () => {
         modalWrap.classList.add('visible');
+        chatStart();
     });
 
     document.querySelector('.chat-close').addEventListener('click', () => {

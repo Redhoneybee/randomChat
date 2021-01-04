@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/977ba55229.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
+        integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="index.css">
     <style>
@@ -29,6 +32,7 @@
         .loading .loader,
         .loading .loader:before,
         .loading .loader:after {
+            -webkit-animation: 1s infinite ease-in-out;
             animation: 1s infinite ease-in-out;
         }
 
@@ -52,26 +56,32 @@
             top: -1px;
             left: -1px;
             opacity: 0;
+            -webkit-animation-name: loader-ani-before;
             animation-name: loader-ani-before;
         }
 
         .loader-text {
+            -webkit-animation: 1s infinite ease-in-out;
+            -webkit-animation-name: text-ani;
             animation: 1s infinite ease-in-out;
             animation-name: text-ani;
         }
 
         @keyframes loader-ani-before {
             0% {
+                -webkit-transform: scale(1);
                 transform: scale(1);
                 opacity: 1;
             }
 
             50% {
+                -webkit-transform: scale(1);
                 transform: scale(1.3);
                 opacity: 0;
             }
 
             100% {
+                -webkit-transform: scale(1.3);
                 transform: scale(1.3);
                 opacity: 0;
             }
@@ -79,19 +89,23 @@
 
         .loader-2:after {
             background-color: #333;
+            -webkit-animation-name: loader-ani-after;
             animation-name: loader-ani-after;
         }
 
         @keyframes loader-ani-after {
             0% {
+                -webkit-transform: scale(1);
                 transform: scale(1);
             }
 
             50% {
+                -webkit-transform: scale(0.7);
                 transform: scale(0.7);
             }
 
             100% {
+                -webkit-transform: scale(1);
                 transform: scale(1);
             }
         }
@@ -107,6 +121,15 @@
 
             100% {
                 opacity: 0;
+            }
+        }
+
+        @keyframes tag {
+            0% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+                opacity: 0;
+                background: #c69c7c;
             }
         }
     </style>
@@ -154,12 +177,37 @@
             </div>
         </div>
         <section class="content-wrap flex">
-            <div class="btn start-btn">Let's Chat!</div>
+            <div class="user">
+                <div class="info-form flex">
+                    <div class="textbox">
+                        <label for="username">username</label>
+                        <input type="text" name="username" id="user-input" />
+                    </div>
+                    <div class="textbox">
+                        <label for="age">age</label>
+                        <input type="text" name="age" id="age-input">
+                    </div>
+                    <div class="wrap-tag">
+                        <ul class="tag-list flex-wrap">
+                        </ul>
+                        <div class="new-tag flex">
+                            <div class="tagbox">
+                                <label for="tagInput">#</label>
+                                <input type="text" name="tag" id="tag-input">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="user-title">
+                </div>
+            </div>
+            <div class="btn chat-start-btn">Let's Chat!</div>
         </section>
     </div>
 </body>
 <script type="text/javascript" src="types.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript" src="js/chat.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
 </html>

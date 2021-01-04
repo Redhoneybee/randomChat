@@ -4,6 +4,7 @@ const user = {
     hashtags: []
 };
 
+
 const alertDatas = {
     exitDuringMatch: {
         title: "Matching Cancel",
@@ -19,6 +20,21 @@ const alertDatas = {
     }
 };
 
+const warringDatas = {
+    type_error: {
+        desc: 'you need to right arguments'
+    },
+    username_error: {
+        desc: 'plz, your username is 16 or less and over 0'
+    },
+    age_error: {
+        desc: 'plz, your age is only two digits number'
+    }
+};
+const TYPE_ERROR = 'TYPE_ERROR';
+const USERNAME_LENGTH_ERROR = 'USERNAME_LENGTH_ERROR';
+const AGE_ERROR = 'AGE_ERROR';
+const SUCCESS = 'SUCCESS';
 
 function checkDevice() {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
@@ -63,48 +79,104 @@ function setContentsSize() {
     }
 }
 
+function compareUsername(username) {
+    if (username.length > 16 || username.length <= 0) {
+        return false;
+    }
+    return true;
+}
+function compareAge(age) {
+    console.log((/^\d$/.test(age)));
+    console.log((/^\d\d$/.test(age)));
+    if (!(/^\d\d$/.test(age)) && !(/^\d$/.test(age))) {
+        return false;
+    }
+    if (age[0] === '0' && age[1] === '0') {
+        return false;
+    }
+    return true;
+}
+
+
+function validateUser() {
+    const { username, age, hashtags } = user;
+    console.log(username, age, hashtags);
+
+    if (username !== 'string' && age !== 'number' && !(hashtags instanceof Array)) {
+        return TYPE_ERROR;
+    } else if (!compareUsername(username)) {
+        return USERNAME_LENGTH_ERROR;
+    } else if (!compareAge(age)) {
+        return AGE_ERROR;
+    }
+
+    return SUCCESS;
+}
+
+function drawFormData() {
+    if (user.username) {
+        const usernameInput = document.querySelector('.info-form .textbox #user-input');
+
+        usernameInput.parentNode.classList.add('visible');
+
+        usernameInput.value = user.username;
+    }
+    if (user.age) {
+        const ageInput = document.querySelector('.info-form .textbox #age-input');
+
+        ageInput.parentNode.classList.add('visible');
+
+        ageInput.value = user.age;
+    }
+
+    const tagList = document.querySelector('.tag-list');
+    let query = ``;
+    user.hashtags.forEach((hashtag, i) => {
+        query += `<li id = "tag-${i + 1}" class = "tag-items">
+                    <span class = "text">${hashtag}</span>
+                    <i class = "fas fa-times x-btn"></i>               
+                    </li>`
+    });
+
+    tagList.innerHTML = query;
+}
+
+
+function saveLocalData() {
+    const userString = JSON.stringify(user);
+
+    localStorage.setItem('userdatas', userString);
+}
+
+function loadLocalData() {
+    const loadUser = localStorage.getItem('userdatas');
+
+    if (loadUser) {
+        const p = JSON.parse(loadUser);
+
+        user.username = p.username;
+        user.age = p.age;
+        user.hashtags = p.hashtags;
+
+    } else {
+        saveLocalData();
+    }
+    drawFormData();
+}
+
 
 function hanldeUserProfile() {
     const infoInputs = document.querySelectorAll('.info-form .textbox input');
     const tagInput = document.querySelector('.new-tag .tagbox input');
-    function compareUsername(username) {
-        if (username.length > 16) {
-            return false;
-        }
-        return true;
-    }
-    function compareAge(age) {
-        if (!(/^\d\d$/.test(age))) {
-            return false;
-        }
-        if (age[0] === '0' && age[1] === '0') {
-            return false;
-        }
-        return true;
-    }
 
-
-    function drawHashTag() {
-        const tagList = document.querySelector('.tag-list');
-        let query = ``;
-        user.hashtags.forEach((hashtag, i) => {
-            query += `<li id = "tag-${i + 1}" class = "tag-items">
-                        <span class = "text">${hashtag}</span>
-                        <i class = "fas fa-times x-btn"></i>               
-                        </li>`
-        });
-
-        tagList.innerHTML = query;
-    }
 
     function setHashtag(e) {
-        e.stopPropagation();
         const len = user.hashtags.length;
         const hashtag = e.target.value;
         if (hashtag !== '' && len < 5) {
             user.hashtags.push(hashtag);
 
-            drawHashTag();
+            drawFormData();
         }
         e.target.value = '';
     }
@@ -123,7 +195,7 @@ function hanldeUserProfile() {
 
             user.hashtags.splice(index, 1);
 
-            drawHashTag()
+            drawFormData()
         }
     }
 
@@ -139,21 +211,28 @@ function hanldeUserProfile() {
             const value = e.target.value;
 
             // value is empty 
+            const type = e.target.name;
             if (value === '') {
                 textbox.classList.remove('visible');
+                if (type === 'username' && !value) user.username = '';
+                else if (type === 'age' && !value) user.age = -1;
             } else {
-                const type = e.target.name;
                 if (type === 'username') {
                     if (compareUsername(value)) {
                         user.username = value;
+                    } else {
+                        user.username = '';
                     }
                 } else if (type === 'age') {
                     if (compareAge(value)) {
                         user.age = parseInt(value, 10);
+                    } else {
+                        user.age = -1;
                     }
                 }
                 console.log(user.username, user.age);
             }
+            saveLocalData();
         });
     });
     const tagList = document.querySelector('.tag-list');
@@ -161,11 +240,13 @@ function hanldeUserProfile() {
         if (e.keyCode == 13) {
             setHashtag(e);
             tagList.addEventListener('click', removeTagEvent);
+            saveLocalData();
         }
     });
     tagInput.addEventListener('blur', (e) => {
         setHashtag(e);
         tagList.addEventListener('click', removeTagEvent);
+        saveLocalData();
     });
 
 }
@@ -174,7 +255,7 @@ function hanldeUserProfile() {
     "use strict";
     const alert = document.querySelector('.modal.alert');
     const mask = document.querySelector('.mask');
-    const modalWrap = document.querySelector('.modal-wrap');
+    const modalWrap = document.querySelector('#popup');
 
     function drowAlert() {
         const title = document.querySelector('.alert-title');
@@ -186,7 +267,7 @@ function hanldeUserProfile() {
         btn[1].innerHTML = alertDatas.exitDuringMatch.no;
 
         btn[0].addEventListener('click', () => {
-            document.querySelector('.modal-wrap').classList.remove('visible');
+            document.querySelector('#popup').classList.remove('visible');
             alert.classList.remove('visible');
             mask.style.zIndex = 'initial';
         });
@@ -198,10 +279,31 @@ function hanldeUserProfile() {
 
 
     setContentsSize();
+    loadLocalData();
     hanldeUserProfile();
+
     document.querySelector('.chat-start-btn').addEventListener('click', () => {
-        modalWrap.classList.add('visible');
-        chatStart();
+        const sysCode = validateUser();
+        let desc = '';
+        if (sysCode === TYPE_ERROR) {
+            desc += warringDatas.type_error.desc;
+        } else if (sysCode === USERNAME_LENGTH_ERROR) {
+            desc += warringDatas.username_error.desc;
+        } else if (sysCode === AGE_ERROR) {
+            desc += warringDatas.age_error.desc;
+        }
+
+        if (desc) {
+            const warring = document.querySelector('#warring');
+            const warring_desc = document.querySelector('#warring .warring-modal .warring-desc');
+            console.log(warring);
+            warring_desc.innerHTML = desc;
+            warring.classList.add('visible');
+            setTimeout(function () { warring.classList.remove('visible') }, 1000);
+        } else {
+            modalWrap.classList.add('visible');
+            chatStart();
+        }
     });
 
     document.querySelector('.chat-close').addEventListener('click', () => {

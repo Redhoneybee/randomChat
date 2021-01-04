@@ -47,10 +47,10 @@ div.modal-wrap .modal{
     height : 100vh;
     box-sizing: border-box;
     opacity : 0;
-    -webkit-transform : scale(0.5);
-    transform : scale(0.5);
-    -webkit-transition : all .3s;
-    transition : all .3s;
+    -webkit-transform : scale(0.6);
+    transform : scale(0.6);
+    -webkit-transition : all .3s ease-out;
+    transition : all .3s ease-out;
 }
 
 div.modal-wrap .modal.alert{
@@ -59,10 +59,10 @@ div.modal-wrap .modal.alert{
     top : 10vh;
     z-index : 100;
     opacity : 0;
-    -webkit-transform : scale(0.3);
-    transform : scale(0.3);
-    -webkit-transition : all .3s;
-    transition : all .3s;
+    -webkit-transform : scale(0.6);
+    transform : scale(0.6);
+    -webkit-transition : all .3s ease-out;
+    transition : all .3s ease-out;
 }
 div.modal-wrap .modal.alert.visible{
     opacity : 1;
@@ -183,6 +183,39 @@ div.modal-wrap .modal.alert .alert-content{
     font-size : 24px;
 }
 
+
+div.modal-wrap .warring-modal{
+    position : relative;
+    top : -20vh;
+    width : calc(100% - 20vw);
+    height : 30vh;
+    background-color : #f4f4f2;
+    -webkit-transfrom : scale(0.6);
+    transform : scale(0.6);
+    opacity : 0;
+    -webkit-transition : all .3s ease-out;
+    transition : all .3 ease-out;   
+}
+div.modal-wrap.visible > .warring-modal{
+    opacity : 1;
+    -webkit-transfrom : scale(1);
+    transform : scale(1);
+}
+.warring-modal .warring-title{
+    position : relative;
+    width : 100%;
+    height : 5vh;
+    line-height : 5vh;
+    background-color : #ea2c62;
+    color : white;
+    font-weight : bold;
+    font-size : 24px;
+    text-align : center;
+    text-transform: uppercase;
+}
+.warring-modal .warring-desc{
+    padding : 15px 20px;
+}
 section:nth-of-type(1) .user{
     color :#ea2c62;
     font-weight : bold;
@@ -348,6 +381,9 @@ section:nth-of-type(1) .user.visible .user-title{
     }
     .alert-content > .alert-text{
         padding : 20px 35px;
+    }
+    div.modal-wrap .warring-modal{
+        width : calc(100% - 50%);
     }
     .btn{
         padding : 20px 45px;

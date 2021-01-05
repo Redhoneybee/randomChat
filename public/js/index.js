@@ -1,6 +1,6 @@
 const user = {
-    username: 'null',
-    age: -1,
+    username: '',
+    age: null,
     hashtags: []
 };
 
@@ -86,8 +86,6 @@ function compareUsername(username) {
     return true;
 }
 function compareAge(age) {
-    console.log((/^\d$/.test(age)));
-    console.log((/^\d\d$/.test(age)));
     if (!(/^\d\d$/.test(age)) && !(/^\d$/.test(age))) {
         return false;
     }
@@ -112,21 +110,43 @@ function validateUser() {
 
     return SUCCESS;
 }
+function removeTagEvent(e) {
+    const target = e.target;
+    let flag = false;
+    target.classList.forEach(e => {
+        if (e === 'x-btn') flag = true;
+    });
 
+    if (flag) {
+        const tag = target.parentNode;
+
+        const tagId = tag.getAttribute('id');
+        const index = parseInt(tagId.slice(tagId.length - 1), 10) - 1;
+
+        user.hashtags.splice(index, 1);
+
+        drawFormData()
+    }
+}
 function drawFormData() {
     if (user.username) {
         const usernameInput = document.querySelector('.info-form .textbox #user-input');
 
-        usernameInput.parentNode.classList.add('visible');
+        if (user.username !== '') {
+            usernameInput.parentNode.classList.add('visible');
+            usernameInput.value = user.username;
 
-        usernameInput.value = user.username;
+        }
+
     }
     if (user.age) {
         const ageInput = document.querySelector('.info-form .textbox #age-input');
 
-        ageInput.parentNode.classList.add('visible');
+        if (user.age) {
+            ageInput.parentNode.classList.add('visible');
+            ageInput.value = user.age;
+        }
 
-        ageInput.value = user.age;
     }
 
     const tagList = document.querySelector('.tag-list');
@@ -139,6 +159,8 @@ function drawFormData() {
     });
 
     tagList.innerHTML = query;
+    tagList.addEventListener('click', removeTagEvent);
+
 }
 
 
@@ -180,24 +202,6 @@ function hanldeUserProfile() {
         }
         e.target.value = '';
     }
-    function removeTagEvent(e) {
-        const target = e.target;
-        let flag = false;
-        target.classList.forEach(e => {
-            if (e === 'x-btn') flag = true;
-        });
-
-        if (flag) {
-            const tag = target.parentNode;
-
-            const tagId = tag.getAttribute('id');
-            const index = parseInt(tagId.slice(tagId.length - 1), 10) - 1;
-
-            user.hashtags.splice(index, 1);
-
-            drawFormData()
-        }
-    }
 
     infoInputs.forEach(input => {
         console.log(input);
@@ -215,7 +219,7 @@ function hanldeUserProfile() {
             if (value === '') {
                 textbox.classList.remove('visible');
                 if (type === 'username' && !value) user.username = '';
-                else if (type === 'age' && !value) user.age = -1;
+                else if (type === 'age' && !value) user.age = null;
             } else {
                 if (type === 'username') {
                     if (compareUsername(value)) {
@@ -227,7 +231,7 @@ function hanldeUserProfile() {
                     if (compareAge(value)) {
                         user.age = parseInt(value, 10);
                     } else {
-                        user.age = -1;
+                        user.age = null;
                     }
                 }
                 console.log(user.username, user.age);
@@ -235,17 +239,14 @@ function hanldeUserProfile() {
             saveLocalData();
         });
     });
-    const tagList = document.querySelector('.tag-list');
     tagInput.addEventListener('keydown', (e) => {
         if (e.keyCode == 13) {
             setHashtag(e);
-            tagList.addEventListener('click', removeTagEvent);
             saveLocalData();
         }
     });
     tagInput.addEventListener('blur', (e) => {
         setHashtag(e);
-        tagList.addEventListener('click', removeTagEvent);
         saveLocalData();
     });
 
